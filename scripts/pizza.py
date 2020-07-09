@@ -133,12 +133,15 @@ def print_info(script_start_time, pizzas):
 
     pizzas += pizza_in_one_try
     script_time = time.time()
-
+    seconds_running = round((script_time - script_start_time),2)
     print('---------------------------------------')
     print(pizza_in_one_try,'new pizza pads formed and deposited to bank.')
     print(pizzas, 'farmed in this session.')
-    print('Script has been running for', round((script_time - script_start_time),2), 'seconds')
+    print('Script has been running for', seconds_running, 'seconds')
     print('---------------------------------------')
+
+    if seconds_running > (3600 + 1800):
+        quit("Script has passed one and a half hour mark. Quitting")
 
     return pizzas
 
