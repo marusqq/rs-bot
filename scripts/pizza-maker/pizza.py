@@ -88,6 +88,9 @@ def roll_the_dice(image):
         waiting_time = rn.randint(1,10)
         print('Waiting randomly for', waiting_time, 'before', image)
         time.sleep(waiting_time)
+    
+    
+
 
 def bank(deposit):
     waitForLoad('banker_shoulder.png', clicks = 'rightsingle')
@@ -138,9 +141,10 @@ def print_info(script_start_time, pizzas):
     print('---------------------------------------')
 
     if seconds_running > (3600 + 1800):
-        quit("Script has passed one and a half hour mark. Quitting... ")
+        quit("Script has passed one and a half hour mark. Quitting...")
 
     return pizzas
+
 
 def pizza_bot():
     deposit = False
@@ -150,6 +154,7 @@ def pizza_bot():
         deposit = bank(deposit)
         make_pizza()
         pizza_count = print_info(script_start_time, pizza_count)
+
 
 pizza_bot()
 
