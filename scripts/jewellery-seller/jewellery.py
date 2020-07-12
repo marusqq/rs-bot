@@ -3,7 +3,14 @@ __script__ = 'for making pizzas'
 
 '''reqs:
 take the needed jeweleries and stand near grum in port sarim
-start in 301 world and sort the worlds descending'''
+start in last world and sort the worlds descending'''
+
+##TODO:
+    #1. Improve stock checking speed (somehow)
+    #2. Implement dynamic inventory checks
+    #3. Implement faster diamond jewellery selling
+    #4. Implement selling for 10 [testing]
+    #5. Make trading grum faster
 
 import pyautogui as ag
 import time 
@@ -67,8 +74,8 @@ def waitForLoad(image, item = 'item', press = True, clicks = 'leftsingle', outpu
     
     item = image[:-4]
     
-    if item == 'trade_grum':
-        duration = 0.1
+    if 'grum' in item:
+        duration = 0.2
     else:
         duration = 0.4
 
@@ -205,7 +212,12 @@ def quantity_to_sell(quantity, loc):
     while quantity > 0:
         ag.moveTo(loc, duration = 0.2)
         ag.click(button = 'right')
-        if quantity >= 5:
+        if quantity == 10:
+            press = waitForLoad('sell10.png', press = True, clicks = 'leftsingle', wait_randomly = False)
+            if press is None:
+                waitForLoad('sell10_highlighted.png', press = True, clicks = 'leftsingle', wait_randomly = False)
+            quantity -= 10
+        elif quantity >= 5:
             press = waitForLoad('sell5.png', press = True, clicks = 'leftsingle', wait_randomly = False)
             if press is None:
                 waitForLoad('sell5_highlighted.png', press = True, clicks = 'leftsingle', wait_randomly = False)
