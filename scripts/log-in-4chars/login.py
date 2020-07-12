@@ -86,7 +86,9 @@ users = file_users.readlines()
 passw = file_passw.readlines()
 
 for i in range(len(users)):
-    waitForLoad('ok.png', press = True, crash_if_not_found = True)
+    ok = waitForLoad('ok.png', press = True, crash_if_not_found = False)
+    if ok is None:
+        waitForLoad('existing.png', press = True, crash_if_not_found = False)
 
     ag.write(encode.decode(users[i].strip('\n')), interval = 0.25)
     ag.hotkey('enter')
@@ -94,6 +96,7 @@ for i in range(len(users)):
     ag.write(encode.decode(passw[i].strip('\n')), interval = 0.25)
     ag.hotkey('enter')
 
+print('Enjoy =)')
     #encode.decode(users[i].strip('\n'))
     #encode.decode(passw[i].strip('\n'))
     

@@ -29,11 +29,17 @@ image_dir = getcwd() + '/pics/'
 
 jewellery_thingies = ['ring', 'necklace', 'amulet']
 shiny_thingies = ['gold', 'sapphire', 'emerald', 'ruby', 'diamond']
-jewellery = []
 
-for jew in jewellery_thingies:
-    for shiny in shiny_thingies:
-        jewellery.append(shiny + '_' + jew)
+used_jew_file = open('used_jewellery.jew', 'r')
+jewellery = used_jew_file.readlines()
+for jew in reversed(jewellery):
+    if '#' in jew:
+        jewellery.remove(jew)
+
+new_jewellery  = []
+for jew in jewellery:
+    new_jewellery.append(jew.rstrip('\n'))
+jewellery = new_jewellery
 
 def moveToLocation(click_location, duration, clicks = None):
 
@@ -114,7 +120,9 @@ def look_for_grum():
         grum = waitForLoad(path, press = True, clicks = 'rightsingle', output = True, maxLoadTime = 1)
 
         if grum is not None:
-            waitForLoad('trade_grum.png', press = True, clicks = 'leftsingle', output = False, maxLoadTime = 2)
+            grum_trade = waitForLoad('trade_grum.png', press = True, clicks = 'leftsingle', output = False, maxLoadTime = 2)
+            if grum_trade is None:
+                return False
             return True
 
         grum_photos -= 1
@@ -124,6 +132,7 @@ def look_for_grum():
 def look_for_stock(out = False):
     to_buy = []
 
+    print('Calculating what to sell now... You can have the mouse for now :)')
     #ring, necklace, amulet
     for jewel in jewellery_thingies:
         if out:
@@ -132,16 +141,24 @@ def look_for_stock(out = False):
         image_path = 'stock/' + jewel + '/'
         
         for photo in stock_pics:
-            if waitForLoad(image_path + photo, press = False, maxLoadTime = 0.1, output=False):
-                item = photo.split('_')
-                
-                if item[1] == 'gold':
-                    max_sell = 10
-                else:
-                    max_sell = 7
-                
-                to_buy.append(str(max_sell - int(item[0])) + '_' + item[1] + '_' + item[2][:-4])
 
+            item = photo.split('_')
+            
+            if item[1] + '_' + item[2][:-4] in jewellery:
+                if waitForLoad(image_path + photo, press = False, maxLoadTime = 0.1, output=False):
+                    if item[1] == 'gold':
+                        max_sell = 10
+                    else:
+                        max_sell = 7
+                    
+                    to_buy.append(str(max_sell - int(item[0])) + '_' + item[1] + '_' + item[2][:-4])
+    
+    print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
+    print('Starting to sell in 3 seconds!')
+    print('vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv')
+
+    time.sleep(3)
+    
     return to_buy
 
 def sell(items_to_sell):
@@ -158,6 +175,8 @@ def sell(items_to_sell):
             photo_path = 'stock/necklaces.png'
         
         column = waitForLoad(photo_path, press = False)
+        if column is None:
+            quit('robe / hat / robes are not found!')
         custom_left = 20
         
         if 'gold' in item:
@@ -201,10 +220,31 @@ def quantity_to_sell(quantity, loc):
 def jump_worlds():
 
     waitForLoad('exit_store.png', press = True)
-    #this needs to be finished
-    #waitForLoad('switch_worlds.png', press =)
+    failed_world = 0
+    jumped = False
 
-    return
+    this_world = waitForLoad('green_world_change.png', press = False)
+
+    while not jumped:
+        
+        #ag.alert(text='Change the world and press ok', title='', button='OK')
+        
+        X_button = waitForLoad('exit_store.png', press = False)
+        up_arrow = [X_button.left + 6, X_button.top + 41]
+        ag.moveTo(up_arrow, duration = 0.2)
+        ag.mouseDown()
+        ag.click()
+
+        next_world = [this_world.left, this_world.top + 2] #+ failed_world]
+        ag.moveTo(next_world, duration = 0.3)
+        ag.click()
+
+        if waitForLoad('please_wait.png', press = False) is not None:
+            print('jumping worlds!')
+            jumped = True
+            failed_world = -20
+
+    return 
 
 def info_about_selling(sell):
     print('-------------------------------------')
@@ -215,6 +255,7 @@ def info_about_selling(sell):
     print('-------------------------------------')
 
 def jewellery_bot():
+    
     while True:
         grum_found = False
         while not grum_found:
@@ -223,7 +264,8 @@ def jewellery_bot():
         what_to_sell = look_for_stock(False)
         info_about_selling(what_to_sell)
         sell(what_to_sell)
-    jump_worlds()
+        jump_worlds()
+        time.sleep(2)
 
     return
 
